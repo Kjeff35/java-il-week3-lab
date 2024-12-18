@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  config-server:
+    build:
+      context: ./config_server
+      dockerfile: Dockerfile
+    container_name: lab-config-server
+    ports:
+      - "8888:8888"
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lab-network
+
+  discovery-server:
+    build:
+      context: ./discovery_server
+      dockerfile: Dockerfile
+    container_name: lab-discovery-server
+    ports:
+      - "8761:8761"
+    env_file:
+      - .env
+    depends_on:
+      config-server:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - lab-network
+
+  gateway-server:
+    build:
+      context: ./gateway_server
+      dockerfile: Dockerfile
+    container_name: lab-gateway
+    ports:
+      - "8765:8765"
+    env_file:
+      - .env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - lab-network
+
+  product-service:
+    build:
+      context: ./product_service
+      dockerfile: Dockerfile
+    container_name: lab-product-service
+    env_file:
+      - .env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - lab-network
+
+  order-service:
+    build:
+      context: ./order_service
+      dockerfile: Dockerfile
+    container_name: lab-order-service
+    env_file:
+      - .env
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - lab-network
+
+networks:
+  lab-network:
+    driver: bridge
+    external: true

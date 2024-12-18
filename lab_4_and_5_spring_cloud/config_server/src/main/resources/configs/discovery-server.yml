@@ -1,0 +1,6 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_DEFAULT_URI}
+    register-with-eureka: false
+    fetch-registry: false

@@ -1,0 +1,21 @@
+# Build Application
+FROM maven:3.9.6 As build
+
+WORKDIR /app
+
+COPY . .
+
+
+# RUN #chmod 755 mvnw
+
+RUN mvn package -DskipTests
+
+# Serve Application
+FROM openjdk:21-bullseye
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+
+
+CMD ["java", "--enable-preview", "-jar", "app.jar"]

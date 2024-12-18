@@ -1,0 +1,29 @@
+spring:
+  application.name: product-service
+  datasource:
+    url: ${PRODUCT_DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JWK_SET_URI}
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_DEFAULT_URI}
+  instance:
+    hostname: ${PRODUCT_SERVICE_HOST_NAME}
+    instance-id: ${spring.application.name}:${random.uuid}
